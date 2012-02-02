@@ -64,9 +64,9 @@ abstract class Pincrowd_Db_MongoAbstract
             ->insert($data);
         return $data;
     }
-    public function findById($id, $fields = null)
+    public function findById($id, $fields = array())
     {
-        $query = array('_id' => new MongoId($id));
+        $query = array('_id' => $id);
         return self::getMongoDB()
             ->__get($this->_name)->findOne($query, $fields);
     }

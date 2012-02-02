@@ -1,5 +1,5 @@
 <?php
-require_once 'Pincrowd/MongoAbstract.php';
+require_once 'Pincrowd/Db/MongoAbstract.php';
 class Pincrowd_Application_Resource_Mongo extends 
     Zend_Application_Resource_ResourceAbstract
 {

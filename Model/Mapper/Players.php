@@ -7,6 +7,7 @@
  */
 class Pincrowd_Model_Mapper_Players extends Pincrowd_Db_MongoAbstract
 {
+    protected $_name = 'users';
     /**
      * @todo not decided I like the whole pass by reference game yet or not.
      * I find it generally a hack and unintuitive to say the least adding a level
