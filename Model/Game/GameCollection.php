@@ -18,7 +18,7 @@
  * @property MongoDate        $dateStarted protected
  * @property MongoDate        $dateEnded   protected
  */
-class Pincrowd_Model_GameCollection extends Zircote_Model_AbstractModelCollection
+class Pincrowd_Model_GameCollection extends Pincrowd_Model_AbstractModelCollection
 {
     /**
      *
@@ -31,7 +31,7 @@ class Pincrowd_Model_GameCollection extends Zircote_Model_AbstractModelCollectio
      * model type.
      * Example:
      * <code>
-     * public function append(Zircote_Model_SomeModel $model)
+     * public function append(Pincrowd_Model_SomeModel $model)
      * {
      *     parent::append($model);
      * }

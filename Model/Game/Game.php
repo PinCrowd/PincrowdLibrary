@@ -17,7 +17,7 @@
  * @property MongoDate        $dateStarted public
  * @property MongoDate        $dateEnded   public
  */
-class Pincrowd_Model_Game extends Zircote_Model_AbstractModel
+class Pincrowd_Model_Game extends Pincrowd_Model_AbstractModel
 {
     protected $_lastUpdatedField = 'dateEnded';
     protected $_halRel = 'game';
