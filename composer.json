@@ -12,6 +12,6 @@
         "php": ">=5.2.4"
     },
     "autoload": {
-        "psr-0": {"Pincrowd": ""}
+        "psr-0": {"Pincrowd": "library"}
     }
 }
