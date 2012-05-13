@@ -10,14 +10,14 @@
  * @package    Library
  * @subpackage Model
  *
- * @property MongoId          $_id         public
- * @property MongoDBRef       $player      public
- * @property array            $frames      public
- * @property integer          $total       public
- * @property MongoDate        $dateStarted public
- * @property MongoDate        $dateEnded   public
+ * @property MongoId    $_id  public
+ * @property MongoDBRef $player      public
+ * @property array      $frames      public
+ * @property integer    $totalpublic
+ * @property MongoDate  $dateStarted public
+ * @property MongoDate  $dateEnded   public
  */
-class Pincrowd_Model_Game extends Pincrowd_Model_AbstractModel
+class Pincrowd_Model_Game_Game extends Pincrowd_Model_AbstractModel
 {
     protected $_lastUpdatedField = 'dateEnded';
     protected $_halRel = 'game';
@@ -31,6 +31,7 @@ class Pincrowd_Model_Game extends Pincrowd_Model_AbstractModel
         '_id' => null,
         'player' => null,
         'throws' => array(),
+        'frames' => array(),
         'total' => null,
         'dateStarted' => null,
         'dateEnded' => null

@@ -124,8 +124,6 @@ abstract class Pincrowd_Rest_AbstractController extends Zend_Controller_Action
      */
     public function init ()
     {
-//         $mongo = new Mongo();
-//         $storage = new StorageMongo($mongo->selectDB('oauth2'));
 //         $this->_oauth = new MongoServer(
 //             $storage, array(MongoServer::CONFIG_SUPPORTED_SCOPES => array('user','admin', 'noaccess'))
 //         );

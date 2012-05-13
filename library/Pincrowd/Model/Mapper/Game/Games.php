@@ -5,4 +5,7 @@ class Pincrowd_Model_Mapper_Game_Games  extends Pincrowd_Db_MongoAbstract
     {
 
     }
+    protected $_databaseName = 'pincrowd';
+    protected $_collectionName = 'games';
+
 }

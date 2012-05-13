@@ -1,7 +1,7 @@
 <?php
 class Pincrowd_Model_Mapper_Match_Matches extends Pincrowd_Db_MongoAbstract
 {
-    protected $_name = 'matches';
+    protected $_collectionName = 'matches';
     /**
      *
      * @param Pincrowd_Model_Match $match

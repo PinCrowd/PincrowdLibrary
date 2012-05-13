@@ -68,6 +68,7 @@ class Pincrowd_Application_Resource_Mongo
             $mongo = new Mongo($server, $options);
             Zend_Registry::set($registry, $mongo);
             $this->setMongo($mongo);
+            Pincrowd_Db_MongoAbstract::setDefaultMongo($mongo);
         }
         return $this->_mongo;
     }

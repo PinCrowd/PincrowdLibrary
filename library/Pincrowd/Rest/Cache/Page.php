@@ -72,7 +72,7 @@ class Pincrowd_Rest_Cache_Page extends Zend_Cache_Core
      *
      * @var boolean
      */
-    protected $_cancel = false;
+    protected $_cancel = true;
 
     /**
      * Constructor
@@ -183,7 +183,7 @@ class Pincrowd_Rest_Cache_Page extends Zend_Cache_Core
     {
         $data = $this->getResponse()->getBody(true);
         $data = $data['default'];
-        if ($this->_cancel || $this->getResponse()->isException() ||
+        if (true || $this->_cancel || $this->getResponse()->isException() ||
             $this->getResponse()->isRedirect() || $this->getResponse()->getHttpResponseCode() > 299) {
             return $data;
         }

@@ -18,7 +18,7 @@
  * @property MongoDate        $dateStarted protected
  * @property MongoDate        $dateEnded   protected
  */
-class Pincrowd_Model_GameCollection extends Pincrowd_Model_AbstractModelCollection
+class Pincrowd_Model_Game_GameCollection extends Pincrowd_Model_AbstractModelCollection
 {
     /**
      *
@@ -38,7 +38,7 @@ class Pincrowd_Model_GameCollection extends Pincrowd_Model_AbstractModelCollecti
      * </code>
      * @param Pincrowd_Model_Game $item
      */
-    public function append(Pincrowd_Model_Game $item){
+    public function append(Pincrowd_Model_Game_Game $item){
         $this->setIsLoaded(true);
         parent::append($item);
     }
