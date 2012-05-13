@@ -1,0 +1,17 @@
+{
+    "name": "PinCrowd/PincrowdLibrary",
+    "type": "library",
+    "version": "0.1.0",
+    "time" : "2012-04-21",
+    "description": "BOWLING REINVENTED",
+    "keywords": ["PC", "PINCROWD"],
+    "homepage": "https://pincrowd.com",
+    "repositories": [
+    ],
+    "require": {
+        "php": ">=5.2.4"
+    },
+    "autoload": {
+        "psr-0": {"Pincrowd": "library"}
+    }
+}
