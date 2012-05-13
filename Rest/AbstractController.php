@@ -6,6 +6,8 @@
  * @package    Pincrowd_Rest
  * @subpackage Controller
  */
+// use OAuth2\Server\MongoServer,
+//     OAuth2\Storage\StorageMongo;
 /**
  * - Method  URI                            Module_Controller::action
  * - GET     /v{?}/users                    Api_UsersController::getAction()
@@ -40,7 +42,7 @@ abstract class Pincrowd_Rest_AbstractController extends Zend_Controller_Action
     protected $_attributes;
     /**
      * The OAuth2 Server Server Class implemented for OAuth aNa
-     * @var OAuth2_MongoServer
+     * @var OAuth2\Server\MongoServer
      */
     protected $_oauth;
     /**
@@ -122,9 +124,11 @@ abstract class Pincrowd_Rest_AbstractController extends Zend_Controller_Action
      */
     public function init ()
     {
-        $mongo = new Mongo();
-//         $storage = new OAuth2_StorageMongo($mongo->selectDB('oauth2'));
-//         $this->_oauth = new OAuth2_MongoServer($storage);
+//         $mongo = new Mongo();
+//         $storage = new StorageMongo($mongo->selectDB('oauth2'));
+//         $this->_oauth = new MongoServer(
+//             $storage, array(MongoServer::CONFIG_SUPPORTED_SCOPES => array('user','admin', 'noaccess'))
+//         );
         /* @var $bootstrap Zend_Pincrowd_Rest_Bootstrap_Bootstrap */
         $bootstrap = Zend_Controller_Front::getInstance()->getParam('bootstrap');
         if($bootstrap->hasResource('rest_controller')){
@@ -132,7 +136,11 @@ abstract class Pincrowd_Rest_AbstractController extends Zend_Controller_Action
                 $bootstrap->getResource('rest_controller')->getRestController()
             );
         }
-        $this->_setUpCache();
+        if($bootstrap->hasResource('cachemanager')){
+            $this->setCache(
+                $bootstrap->getResource('cachemanager')->getCache('page_cache')
+            );
+        }
         if($bootstrap->hasResource('log')){
             $this->setLog(
                 $bootstrap->getResource('log')
@@ -211,6 +219,17 @@ abstract class Pincrowd_Rest_AbstractController extends Zend_Controller_Action
         }
     }
     /**
+     * etag action for when etags are a match
+     * Set Response to 304 Not Modified
+     * @return true
+     */
+    protected function etagAction()
+    {
+        $this->getResponse()
+            ->setHttpResponseCode(304);
+        return true;
+    }
+    /**
      * (non-PHPdoc)
      * @see Zend_Controller_Action::postDispatch()
      */
@@ -219,7 +238,7 @@ abstract class Pincrowd_Rest_AbstractController extends Zend_Controller_Action
         if($this->_service instanceof Pincrowd_Rest_AbstractService){
             $this->_service->postDispatch();
         }
-//         $this->_purgeCache();
+        $this->_purgeCache();
         $this->_acceptPostDispatch();
     }
     /**
@@ -291,7 +310,17 @@ abstract class Pincrowd_Rest_AbstractController extends Zend_Controller_Action
         $this->getAction();
     }
     /**
+     *
+     * @OPTIONS
+     * @SwaggerPath /
+     * @SwaggerOperation(
+     *     value="Returns the OPTIONS headers for allowed operations on the resource."
+     * )
+     * @SwaggerError(code=400,reason="Invalid ID Provided")
+     * @SwaggerError(code=403,reason="User Not Authorized")
+     *
      * Default OPTIONS
+     * @see Pincrowd_Rest_AbstractController::optionsAction()
      */
     public function optionsAction() {
         if(!$this->getResponse()->isException()){
@@ -310,14 +339,65 @@ abstract class Pincrowd_Rest_AbstractController extends Zend_Controller_Action
          * See preDispatch() for more details.
          */
         $request = $this->getRequest();
-        $this->getResponse()
-             ->setHeader('Access-Control-Allow-Origin', $request->getHeader('Origin'), true);
-        $this->getResponse()
-             ->setHeader('Access-Control-Allow-Headers', $request->getHeader('Access-Control-Request-Headers'), true);
-        $this->getResponse()
-             ->setHeader('Access-Control-Allow-Methods', $request->getHeader('Access-Control-Request-Method'), true);
+        $this->getResponse()->setHeader(
+            'Access-Control-Allow-Origin', $request->getHeader('Origin'), true
+        );
+        $this->getResponse()->setHeader(
+            'Access-Control-Allow-Headers',
+            $request->getHeader('Access-Control-Request-Headers'), true
+        );
+        $this->getResponse()->setHeader(
+            'Access-Control-Allow-Methods',
+            $request->getHeader('Access-Control-Request-Method'), true
+        );
 
         $this->getResponse()->setBody(null);
+    }
+    /**
+     *
+     * @param string $result
+     */
+    protected function _saveEtag($result)
+    {
+        /* @var $request Zend_Controller_Request_Http */
+        $request = $this->getRequest();
+        if($this->getCache()){
+            $etag = sprintf(
+                '%u',
+                crc32(json_encode($this->_service->getAttributes() . $result))
+            );
+            $this->getResponse()->setHeader('ETag', '"'.$etag.'"');
+            $key = $this->_getEtagCacheKey($etag);
+            $this->getCache()->save(serialize($this->getResponse()->getHeaders()),$key);
+        }
+    }
+    /**
+     *
+     * @param string $etag
+     */
+    protected function _getEtagCacheKey($etag)
+    {
+        $client_id = 1014;
+        $filter = new Zend_Filter_Alnum(false);
+        $etagKey = $filter->filter($this->getRequest()->getPathInfo());
+        return "{$client_id}_{$etagKey}_{$etag}";
+    }
+    /**
+     * @return bool
+     */
+    protected function _checkEtagAndHandle()
+    {
+        $etag = $this->getRequest()->getHeader('ETag');
+        $key = $this->_getEtagCacheKey($etag);
+        if($headers = $this->getCache()->load($key)){
+            $headers = unserialize($headers);
+            foreach ($headers as $value) {
+                $this->getResponse()->setHeader($value['name'], $value['value']);
+            }
+            return $this->etagAction();
+        } else {
+            return false;
+        }
     }
     /**
      * (non-PHPdoc)
@@ -329,12 +409,52 @@ abstract class Pincrowd_Rest_AbstractController extends Zend_Controller_Action
         $method = $this->_service
             ->methodRequest() ? : $this->getRequest()->getMethod();
         $method = strtolower($method) . 'Action';
+
+        $zRef = new Zend_Reflection_Class($this);
+        /* @var $method Zend_Reflection_Method */
+        $this->_scopes = array();
+        foreach ($zRef->getMethods(Zend_Reflection_Method::IS_PUBLIC) as $name => $_method) {
+            $this->_scopes[$_method->getName()] = array();
+            if(preg_match_all('/@OAuthScope\s{1,}(.*)/i', $_method->getDocComment(), $matches)){
+                foreach ($matches[1] as $scopes) {
+                    $scopes = explode(' ', $scopes);
+                    foreach ($scopes as $scope) {
+                        array_push($this->_scopes[$_method->getName()], $scope);
+                    }
+                }
+            }
+        }
+        $scope = @$this->_scopes[$method] ?: 'noaccess';
+//         try {
+// //             $this->_oauth->verifyAccessToken(
+// //                 $this->_oauth->getBearerToken() , $scope
+//             );
+//         } catch (OAuth2\Exception\AuthenticateException $authenticationException){
+//             /* @todo remove hard-code */
+//             $url = Zend_Uri_Http::fromString('http://org.local/v2/oauth/authorize');
+//             $url->setQuery(array(
+//                 'redirect_uri' => 'http://org.local/v1/leadresponder',
+//                 'client_id' => 'zircote',
+//                 'client_secret' => '54321',
+//                 'response_type' => 'token',
+//                 'scope' => 'user'
+//             ));;
+// //             $this->_redirect((string) $url);
+//             $authenticationException->sendHttpResponse();
+//         } catch (OAuth2\Exception\ServerException $serverException){
+//             $serverException->sendHttpResponse();
+//         }
+
+        $this->_setUpCache();
+
+
         if ($reflected->hasMethod($method)) {
             return $reflected->getMethod($method)
             ->invokeArgs($this,is_array($args) ? $args : array());
         }
         $this->notAllowedAction();
-    }    /**
+    }
+    /**
      *
      * @return Pincrowd_Controller_RestControllerAbstract
      */
@@ -389,7 +509,7 @@ abstract class Pincrowd_Rest_AbstractController extends Zend_Controller_Action
                 $result = $this->_toJson();
             break;
         }
-//         $this->_saveEtag($result);
+        $this->_saveEtag($result);
         return $result;
     }
     /**

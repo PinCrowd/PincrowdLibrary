@@ -120,7 +120,7 @@ abstract class Pincrowd_Db_MongoAbstract
      *
      * @param string $attr
      * @param mixed $value
-     * @return Ifbyphone_Model_AbstractModelCollection
+     * @return Pincrowd_Model_AbstractModelCollection
      */
     public function setAttribute($attr, $value)
     {
@@ -130,7 +130,7 @@ abstract class Pincrowd_Db_MongoAbstract
     /**
      *
      * @param array $attr
-     * @return Ifbyphone_Model_AbstractModelCollection
+     * @return Pincrowd_Model_AbstractModelCollection
      */
     public function setAttributes(array $attr)
     {
@@ -156,7 +156,7 @@ abstract class Pincrowd_Db_MongoAbstract
     /**
      *
      * @param Zend_Db_Adapter_Abstract $db
-     * @return Ifbyphone_Model_Mapper_AbstractDbMapper
+     * @return Pincrowd_Model_Mapper_AbstractDbMapper
      */
     public function setDb (Zend_Db_Adapter_Abstract $db)
     {
@@ -198,7 +198,7 @@ abstract class Pincrowd_Db_MongoAbstract
     }
     /**
      *
-     * @return Ifbyphone_Model_Mapper_LeadResponder_MailRoute
+     * @return Pincrowd_Model_Mapper_LeadResponder_MailRoute
      */
     protected function _getSort()
     {
@@ -214,12 +214,12 @@ abstract class Pincrowd_Db_MongoAbstract
      * @todo must validate somewhere that these are valid fields before
      *       constructing the query
      *
-     * @return Ifbyphone_Model_Mapper_LeadResponder_MailRoute
+     * @return Pincrowd_Model_Mapper_LeadResponder_MailRoute
      */
     abstract protected function _getFields();
     /**
      *
-     * @return Ifbyphone_Model_Mapper_LeadResponder_MailRoute
+     * @return Pincrowd_Model_Mapper_LeadResponder_MailRoute
      */
     protected function _getPaging()
     {
@@ -231,7 +231,7 @@ abstract class Pincrowd_Db_MongoAbstract
     }
     /**
      *
-     * @return Ifbyphone_Model_Mapper_LeadResponder_MailRoute
+     * @return Pincrowd_Model_Mapper_LeadResponder_MailRoute
      */
     protected function _getAuth()
     {
@@ -249,7 +249,7 @@ abstract class Pincrowd_Db_MongoAbstract
     }
     /**
      *
-     * @return Ifbyphone_Model_Mapper_LeadResponder_MailRoute
+     * @return Pincrowd_Model_Mapper_LeadResponder_MailRoute
      */
     protected function _getSearch()
     {
