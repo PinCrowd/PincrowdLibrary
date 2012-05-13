@@ -549,7 +549,7 @@ abstract class Pincrowd_Rest_AbstractService
     /**
      * @return Pincrowd_Model_AbstractModelCollection
      */
-    abstract public function getCollection();
+    abstract public function getList();
     /**
      *
      * @param string $id
@@ -563,17 +563,17 @@ abstract class Pincrowd_Rest_AbstractService
     /**
      * @param Pincrowd_Model_AbstractModel $data
      */
-    abstract public function createOne($data);
+    abstract public function insert($data);
     /**
      *
      * @param integer $id
      * @return Pincrowd_Model_AbstractModel
      */
-    abstract public function updateOne($id);
+    abstract public function update($id);
     /**
      *
      * @param integer $id
      * @return void
      */
-    abstract public function deleteOne($id);
+    abstract public function delete($id);
 }
