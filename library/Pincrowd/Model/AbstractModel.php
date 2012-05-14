@@ -180,14 +180,14 @@ Pincrowd_Rest_IsLoadableInterface
         $result = array();
         if($this->_attributes['fields']){
             foreach ($this->_attributes['fields'] as $field) {
-                $result[$field] = $this->_params[$field];
+                $result[$field] = $this->__get($field);
             }
-            return $result;
         } else {
             $result = $this->_params;
         }
         /* Cast Type */
         foreach ($result as $name => $value) {
+            $value = $this->__get($name);
             $result[$name] = $this->_castType($name, $value);
         }
         return $result;

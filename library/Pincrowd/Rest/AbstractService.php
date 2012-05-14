@@ -251,6 +251,7 @@ abstract class Pincrowd_Rest_AbstractService
      */
     public function methodRequest()
     {
+        return false;
         $options = $this->getOption('method');
         if($options['enabled']){
             if(($method = $this->_controller->getRequest()->getParam('_method', false))

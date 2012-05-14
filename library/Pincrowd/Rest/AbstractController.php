@@ -359,7 +359,7 @@ abstract class Pincrowd_Rest_AbstractController extends Zend_Controller_Action
     {
         /* @var $request Zend_Controller_Request_Http */
         $request = $this->getRequest();
-        if($this->getCache()){
+        if($this->getCache() && $this->getCache()->getOption('caching')){
             $etag = sprintf(
                 '%u',
                 crc32(json_encode($this->_service->getAttributes() . $result))
@@ -404,12 +404,11 @@ abstract class Pincrowd_Rest_AbstractController extends Zend_Controller_Action
     public function __call($method, $args = array())
     {
         $reflected = new ReflectionClass($this);
-        $method = $this->_service
-            ->methodRequest() ? : $this->getRequest()->getMethod();
+        $method =  $this->getRequest()->getMethod();
         $method = strtolower($method) . 'Action';
 
         $zRef = new Zend_Reflection_Class($this);
-        /* @var $method Zend_Reflection_Method */
+     /* @var $method Zend_Reflection_Method */
         $this->_scopes = array();
         foreach ($zRef->getMethods(Zend_Reflection_Method::IS_PUBLIC) as $name => $_method) {
             $this->_scopes[$_method->getName()] = array();
@@ -661,16 +660,21 @@ abstract class Pincrowd_Rest_AbstractController extends Zend_Controller_Action
     {
         $bootstrap = Zend_Controller_Front::getInstance()->getParam('bootstrap');
         if($bootstrap->hasResource('cachemanager') &&
-        (($cache = $bootstrap->getResource('cachemanager')
-         ->getCache('page_cache'))  instanceof Pincrowd_Rest_Cache_Page)){
+            (($cache = $bootstrap->getResource('cachemanager')
+                 ->getCache('page_cache'))  instanceof Pincrowd_Rest_Cache_Page)
+        ){
             $this->setCache($cache);
-            if($this->_resource){
+            if($this->_resource && $this->getCache()->getOption('caching')){
                 $this->getCache()->setItemTags('__resource__'.$this->_resource);
             }
-            if($this->getRequest()->isGet() || $this->getRequest()->isHead()){
+            if($this->getRequest()->isGet() || $this->getRequest()->isHead() &&
+               $this->getCache()->getOption('caching')
+            ){
                 $this->getCache()->start();
             } elseif($this->getRequest()->getHeader('if-match') &&
-            !$this->getCache()->testETag($this->getRequest()->getHeader('if-match'))){
+                     $this->getCache()->getOption('caching') &&
+                     !$this->getCache()->testETag($this->getRequest()->getHeader('if-match'))
+            ){
                 throw new Exception(
                     sprintf(
                         'ETag does not match [if-match:%s]',
@@ -698,8 +702,7 @@ abstract class Pincrowd_Rest_AbstractController extends Zend_Controller_Action
             $this->getCache()->clean(
                 Zend_Cache::CLEANING_MODE_MATCHING_TAG,
                 array(
-                    '__resource__' . $this->_resource,
-                    '__client_id__' . 1014
+                    '__resource__' . $this->_resource
                 )
             );
         }

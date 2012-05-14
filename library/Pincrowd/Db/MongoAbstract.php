@@ -37,6 +37,20 @@ abstract class Pincrowd_Db_MongoAbstract
     {
         return self::$_mongo;
     }
+    public function setDatabaseName($databaseName)
+    {
+        $this->_databaseName = $databaseName;
+        return $this;
+    }
+    public function getDatabaseName()
+    {
+        return $this->_databaseName;
+    }
+    public function setCollectionName($collectionName)
+    {
+        $this->_collectionName = $collectionName;
+        return $this;
+    }
     /**
      *
      *
@@ -76,9 +90,10 @@ abstract class Pincrowd_Db_MongoAbstract
      */
     public function insert($data)
     {
+        unset($data['_id']);
         $this->getMongoDB($this->_databaseName)
             ->__get($this->_collectionName)
-            ->insert($data);
+            ->save($data);
         return $data;
     }
     /**
@@ -91,7 +106,7 @@ abstract class Pincrowd_Db_MongoAbstract
     {
         $this->getMongoDB($this->_databaseName)
             ->__get($this->_collectionName)
-            ->save($data);
+            ->update($data);
         return $data;
     }
     public function findById($id, $fields = array())

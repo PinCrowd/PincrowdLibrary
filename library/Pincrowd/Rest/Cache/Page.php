@@ -102,7 +102,9 @@ class Pincrowd_Rest_Cache_Page extends Zend_Cache_Core
      */
     public function start($id = false, $tags = null, $doNotDie = false)
     {
-        $this->_cancel = false;
+        if(!$this->_options['caching']){
+            return false;
+        }
         $capabilities = $this->_backend->getCapabilities();
         if(!$capabilities['tags']){
             Zend_Cache::throwException('Tags are required for this page cache');
@@ -182,9 +184,18 @@ class Pincrowd_Rest_Cache_Page extends Zend_Cache_Core
     public function _flush()
     {
         $data = $this->getResponse()->getBody(true);
-        $data = $data['default'];
-        if (true || $this->_cancel || $this->getResponse()->isException() ||
-            $this->getResponse()->isRedirect() || $this->getResponse()->getHttpResponseCode() > 299) {
+        if(!isset($data['default']) || empty($data['default'])){
+            $this->cancel();
+            $data = null;
+        }else {
+            $data = $data['default'];
+        }
+        if (!$this->_options['caching'] ||
+            $this->_cancel ||
+            $this->getResponse()->isException() ||
+            $this->getResponse()->isRedirect() ||
+            $this->getResponse()->getHttpResponseCode() > 299
+        ) {
             return $data;
         }
         $etag = md5($data);
