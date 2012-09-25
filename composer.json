@@ -1,15 +1,25 @@
 {
-    "name": "PinCrowd/PincrowdLibrary",
+    "name": "pincrowd/pincrowdlibrary",
     "type": "library",
     "version": "0.1.0",
     "time" : "2012-04-21",
-    "description": "BOWLING REINVENTED",
-    "keywords": ["PC", "PINCROWD"],
+    "description": "bowling reinvented",
+    "keywords": ["PC", "pincrowd"],
     "homepage": "https://pincrowd.com",
-    "repositories": [
+    "config": {
+        "bin-dir": "bin"
+    },
+    "minimum-stability": "alpha",
+    "repositories":[
+        {
+            "type": "vcs",
+            "url": "git://github.com/zircote/AMQP.git"
+        }
     ],
     "require": {
-        "php": ">=5.2.4"
+        "php": ">=5.3.3",
+        "doctrine/mongodb-odm": "dev-master",
+        "zircote/AMQP": "dev-master"
     },
     "autoload": {
         "psr-0": {"Pincrowd": "library"}
